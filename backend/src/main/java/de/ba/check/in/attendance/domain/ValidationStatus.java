@@ -1,0 +1,16 @@
+package de.ba.check.in.attendance.domain;
+
+public enum ValidationStatus {
+    VALID,
+    INVALID,
+    REPLAY_DETECTED,
+    DEVICE_NOT_APPROVED,
+    DEVICE_REVOKED,
+    INVALID_SIGNATURE,
+    UNKNOWN_TAG,
+    CARD_INACTIVE,
+    NO_MATCHING_LECTURE,
+    OVERLAPPING_LECTURES,
+    ABSENCE_ACTIVE,
+    ALREADY_CHECKED_IN
+}

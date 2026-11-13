@@ -1,0 +1,29 @@
+spring:
+  config:
+    import: optional:file:../.env[.properties]
+
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB:ba_check_in}
+    username: ${POSTGRES_USER:ba_check_in}
+    password: ${POSTGRES_PASSWORD:ba_check_in}
+
+  flyway:
+    locations:
+      - classpath:db/migration
+      - classpath:db/dev-migration
+
+  jpa:
+    show-sql: true
+
+app:
+  nfc:
+    key-version: ${NTAG424_KEY_VERSION:v1}
+    metadata-master-key-file: ""
+    authentication-master-key-file: ""
+    metadata-master-key-hex: ${NTAG424_METADATA_MASTER_KEY_HEX:00000000000000000000000000000000}
+    authentication-master-key-hex: ${NTAG424_AUTHENTICATION_MASTER_KEY_HEX:00000000000000000000000000000000}
+    allow-insecure-keys: true
+
+  security:
+    activation-code:
+      hmac-secret: ${ACTIVATION_CODE_HMAC_SECRET:MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=}

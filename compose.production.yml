@@ -1,0 +1,54 @@
+name: ba-check-in
+
+services:
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB must be set}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER must be set}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/gruppe5-ba/app-backend:latest}
+    user: "${BACKEND_UID:-1000}:${BACKEND_GID:-1000}"
+    pull_policy: always
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_PRIVATE_KEY_LOCATION: file:/run/secrets/jwt-private.pem
+      JWT_PUBLIC_KEY_LOCATION: file:/run/secrets/jwt-public.pem
+      ACTIVATION_CODE_HMAC_SECRET: ${ACTIVATION_CODE_HMAC_SECRET:?ACTIVATION_CODE_HMAC_SECRET must be set}
+      NTAG424_KEY_VERSION: ${NTAG424_KEY_VERSION:-v1}
+      NTAG424_METADATA_MASTER_KEY_FILE: /run/secrets/ntag424-metadata-master-key.hex
+      NTAG424_AUTHENTICATION_MASTER_KEY_FILE: /run/secrets/ntag424-authentication-master-key.hex
+      FORWARD_HEADERS_STRATEGY: native
+    volumes:
+      - ${JWT_PRIVATE_KEY_FILE:-./secrets/jwt-private.pem}:/run/secrets/jwt-private.pem:ro
+      - ${JWT_PUBLIC_KEY_FILE:-./secrets/jwt-public.pem}:/run/secrets/jwt-public.pem:ro
+      - ${NTAG424_METADATA_MASTER_KEY_FILE:-./secrets/ntag424-metadata-master-key.hex}:/run/secrets/ntag424-metadata-master-key.hex:ro
+      - ${NTAG424_AUTHENTICATION_MASTER_KEY_FILE:-./secrets/ntag424-authentication-master-key.hex}:/run/secrets/ntag424-authentication-master-key.hex:ro
+    networks:
+      default:
+      npm_proxy:
+        aliases:
+          - bacheckin-backend
+
+volumes:
+  postgres_data:
+
+networks:
+  npm_proxy:
+    external: true

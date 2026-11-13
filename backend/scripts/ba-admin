@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /srv/bacheckin
+export DOCKER_CONFIG=/srv/bacheckin/docker-config
+
+exec docker compose --progress quiet --ansi never \
+  --env-file .env.production -f compose.production.yml \
+  run --rm --no-deps --pull never backend \
+  --spring.profiles.active=admin \
+  --spring.main.banner-mode=off \
+  --logging.level.root=ERROR \
+  "$@"

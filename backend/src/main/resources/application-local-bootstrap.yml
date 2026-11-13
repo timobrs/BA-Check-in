@@ -1,0 +1,5 @@
+app:
+  security:
+    local-bootstrap:
+      secretary-user-id: ${BOOTSTRAP_SECRETARY_USER_ID}
+      activation-code: ${BOOTSTRAP_ACTIVATION_CODE}

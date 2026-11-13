@@ -1,0 +1,6 @@
+app:
+  security:
+    production-bootstrap:
+      first-name: ${BOOTSTRAP_SECRETARY_FIRST_NAME}
+      last-name: ${BOOTSTRAP_SECRETARY_LAST_NAME}
+      email: ${BOOTSTRAP_SECRETARY_EMAIL}

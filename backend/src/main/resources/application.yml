@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: ba-check-in-backend
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  web:
+    error:
+      include-message: never
+      include-binding-errors: never
+      include-exception: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+app:
+  nfc:
+    key-version: ${NTAG424_KEY_VERSION:v1}
+    metadata-master-key-file: ${NTAG424_METADATA_MASTER_KEY_FILE:/run/secrets/ntag424-metadata-master-key.hex}
+    authentication-master-key-file: ${NTAG424_AUTHENTICATION_MASTER_KEY_FILE:/run/secrets/ntag424-authentication-master-key.hex}
+    metadata-master-key-hex: ""
+    authentication-master-key-hex: ""
+    allow-insecure-keys: false
+
+  security:
+    jwt:
+      issuer: ba-check-in-backend
+      audience: ba-check-in-api
+      access-ttl: PT5M
+      private-key: ${JWT_PRIVATE_KEY_LOCATION}
+      public-key: ${JWT_PUBLIC_KEY_LOCATION}
+
+    refresh-token:
+      idle-ttl: P7D
+      family-ttl: P30D
+
+    activation-code:
+      ttl: PT30M
+      challenge-ttl: PT2M
+      hmac-secret: ${ACTIVATION_CODE_HMAC_SECRET}
+
+    device-session:
+      challenge-ttl: PT2M
+      allowed-clock-skew: PT1M
+
+    cleanup:
+      interval: PT1H
+      authentication-history-retention: P7D
+      rate-limit-retention: P1D
+
+server:
+  port: 8080
+  forward-headers-strategy: ${FORWARD_HEADERS_STRATEGY:NONE}
